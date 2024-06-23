@@ -1,6 +1,13 @@
 from _typeshed import Incomplete
+from pathlib import Path
+from typing import TypedDict, type_check_only
 
 from .base import DictType
+
+@type_check_only
+class ContainerWeightDevice(TypedDict):
+    Path: Path
+    Weight: int
 
 class LogConfigTypesEnum:
     JSON: Incomplete
@@ -95,7 +102,7 @@ class HostConfig(dict[str, Incomplete]):
         cpu_quota: Incomplete | None = None,
         cpu_period: Incomplete | None = None,
         blkio_weight: Incomplete | None = None,
-        blkio_weight_device: Incomplete | None = None,
+        blkio_weight_device: list[ContainerWeightDevice] | None = None,
         device_read_bps: Incomplete | None = None,
         device_write_bps: Incomplete | None = None,
         device_read_iops: Incomplete | None = None,

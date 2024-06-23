@@ -108,9 +108,12 @@ class ContainerCollection(Collection[Container]):
         stdout: bool = True,
         stderr: bool = False,
         remove: bool = False,
-        **kwargs,
+        *,
+        auto_remove: bool = False,
     ): ...
-    def create(self, image: str, command: str | list[str] | None = None, **kwargs) -> Container: ...  # type:ignore[override]
+    def create(
+        self, image: str, command: str | list[str] | None = None, *, auto_remove: bool = False
+    ) -> Container: ...  # type:ignore[override]
     def get(self, container_id: str) -> Container: ...
     def list(
         self,
