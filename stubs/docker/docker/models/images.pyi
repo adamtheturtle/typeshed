@@ -5,6 +5,9 @@ from typing_extensions import TypeAlias
 from .resource import Collection, Model
 
 _ImageList: TypeAlias = list[Image]  # To resolve conflicts with a method called "list"
+# Type alias for JSON, explained at:
+# https://github.com/python/typing/issues/182#issuecomment-1320974824.
+_JSON: TypeAlias = dict[str, _JSON] | list[_JSON] | str | int | float | bool | None
 
 class Image(Model):
     @property
@@ -31,7 +34,7 @@ class RegistryData(Model):
 
 class ImageCollection(Collection[Image]):
     model: type[Image]
-    def build(self, **kwargs) -> tuple[Image, Iterator[Any]]: ...
+    def build(self, **kwargs) -> tuple[Image, Iterator[_JSON]]: ...
     def get(self, name: str) -> Image: ...
     def get_registry_data(self, name, auth_config: dict[str, Any] | None = None) -> RegistryData: ...
     def list(self, name: str | None = None, all: bool = False, filters: dict[str, Any] | None = None) -> _ImageList: ...
