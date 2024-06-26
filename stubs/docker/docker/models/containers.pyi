@@ -101,6 +101,7 @@ class Container(Model):
 
 class ContainerCollection(Collection[Container]):
     model: type[Container]
+    @overload
     def run(
         self,
         image: str | Image,
@@ -111,9 +112,18 @@ class ContainerCollection(Collection[Container]):
         *,
         auto_remove: bool = False,
     ): ...
-    def create(
-        self, image: str, command: str | list[str] | None = None, *, auto_remove: bool = False
-    ) -> Container: ...  # type:ignore[override]
+    @overload
+    def run(
+        self,
+        image: str | Image,
+        command: str | list[str] | None = None,
+        stdout: bool = True,
+        stderr: bool = False,
+        remove: bool = False,
+        *,
+        detach: Literal[True],
+        **kwargs,
+    ) -> Container: ...
     def get(self, container_id: str) -> Container: ...
     def list(
         self,

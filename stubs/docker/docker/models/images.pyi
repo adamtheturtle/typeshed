@@ -3,12 +3,21 @@ from io import StringIO
 from typing import IO, Any, Literal, TypedDict, overload, type_check_only
 from typing_extensions import TypeAlias
 
+from docker._types import JSON
+
 from .resource import Collection, Model
 
 _ImageList: TypeAlias = list[Image]  # To resolve conflicts with a method called "list"
 # Type alias for JSON, explained at:
 # https://github.com/python/typing/issues/182#issuecomment-1320974824.
 _JSON: TypeAlias = dict[str, _JSON] | list[_JSON] | str | int | float | bool | None
+
+@type_check_only
+class _ContainerLimits(TypedDict, total=False):
+    memory: int
+    memswap: int
+    cpushares: int
+    cpusetcpus: str
 
 @type_check_only
 class _ContainerLimits(TypedDict, total=False):
@@ -70,17 +79,41 @@ class ImageCollection(Collection[Image]):
         platform: str | None = None,
         isolation: str | None = None,
         use_config_proxy: bool = True,
-    ) -> tuple[Image, Iterator[_JSON]]: ...
+    ) -> tuple[Image, Iterator[JSON]]: ...
     def get(self, name: str) -> Image: ...
     def get_registry_data(self, name, auth_config: dict[str, Any] | None = None) -> RegistryData: ...
     def list(self, name: str | None = None, all: bool = False, filters: dict[str, Any] | None = None) -> _ImageList: ...
     def load(self, data: bytes) -> _ImageList: ...
     @overload
-    def pull(self, repository: str, tag: str | None = None, all_tags: Literal[False] = False, **kwargs) -> Image: ...
+    def pull(
+        self,
+        repository: str,
+        tag: str | None = None,
+        all_tags: Literal[False] = False,
+        *,
+        platform: str | None = None,
+        auth_config: dict[str, Any] | None = None,
+    ) -> Image: ...
     @overload
-    def pull(self, repository: str, tag: str | None = None, *, all_tags: Literal[True], **kwargs) -> _ImageList: ...
+    def pull(
+        self,
+        repository: str,
+        tag: str | None = None,
+        *,
+        all_tags: Literal[True],
+        auth_config: dict[str, Any] | None = None,
+        platform: str | None = None,
+    ) -> _ImageList: ...
     @overload
-    def pull(self, repository: str, tag: str | None, all_tags: Literal[True], **kwargs) -> _ImageList: ...
+    def pull(
+        self,
+        repository: str,
+        tag: str | None,
+        all_tags: Literal[True],
+        *,
+        auth_config: dict[str, Any] | None = None,
+        platform: str | None = None,
+    ) -> _ImageList: ...
     def push(self, repository: str, tag: str | None = None, **kwargs): ...
     def remove(self, *args, **kwargs) -> None: ...
     def search(self, *args, **kwargs): ...
